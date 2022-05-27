@@ -22,4 +22,4 @@
 Правильно реализовать валидацию
 
 ### Ознакомиться с текущим этапом можно по ссылке:
-* [Mesto](https://jakiehan.github.io/mesto-react/)
+* [Mesto](https://jakiehan.github.io/react-mesto-auth/)
