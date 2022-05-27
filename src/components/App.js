@@ -31,14 +31,12 @@ const App = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
-  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const navigate = useNavigate();
 
 
   // Валидацию пока не хватило времени и ума как сделать правильно(
 
   // Бургерное меню тоже не реализовано из-за нехватки времени до дедлайна, но в процессе доделаю
-
 
 
   /*const [validationData, setValidationData] = useState({
@@ -84,7 +82,6 @@ const App = () => {
     if (jwt) {
       auth.checkJwt(jwt)
         .then((res) => {
-          setIsAuthLoading(true);
           setLoggedIn(true);
           setUserEmail(res.data.email);
           navigate('/');
@@ -224,7 +221,7 @@ const App = () => {
         <Header userEmail={userEmail} handleSingOut={handleSingOut} />
         <Routes>
           <Route path="/" element={
-              <ProtectedRoute authLoading={isAuthLoading} loggedIn={loggedIn}>
+              <ProtectedRoute loggedIn={loggedIn}>
                 <Main
                   onEditProfile={handleEditProfileClick}
                   onAddPlace={handleAddPlaceClick}
