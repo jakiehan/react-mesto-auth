@@ -1,39 +1,23 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PopupWithForm from './PopupWithForm.js';
+import { useFormAndValidation } from '../hooks/useFormAndValidation';
 
 const EditAvatarPopup = ({ isOpen, onClose, onUpdateAvatar, isPreloader }) => {
 
-  const [value, setValue] = useState('');
-  const [errorMessage, setErrorMessage] = useState('')
-  const [isValid, setIsValid] = useState(false);
-  const avatarRef = useRef();
+  const {values, handleChange, errors, isValid, resetForm} = useFormAndValidation();
 
-  const errorClsInput = errorMessage && 'form__field_type_error';
-
-  const handleChangeAvatar = (e) => {
-    setValue(e.target.value);
-
-    if (!e.target.validity.valid) {
-      setIsValid(false);
-      setErrorMessage(e.target.validationMessage);
-    } else {
-      setErrorMessage('');
-      setIsValid(true);
-    }
-  }
+  const errorClsInput = errors.avatar && 'form__field_type_error';
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     onUpdateAvatar({
-      avatar: avatarRef.current.value,
+      avatar: values.avatar,
     });
   }
 
   useEffect(() => {
-    setValue('');
-    setErrorMessage('');
-    setIsValid(false);
+    resetForm();
   }, [isOpen]);
 
   return (
@@ -51,17 +35,16 @@ const EditAvatarPopup = ({ isOpen, onClose, onUpdateAvatar, isPreloader }) => {
       <div className="form__input-wrapper">
         <input
           className={`form__field ${errorClsInput}`}
-          ref={avatarRef}
           id="input-link-avatar"
           type="url"
           name="avatar"
-          value={value || ''}
-          onChange={handleChangeAvatar}
+          value={values.avatar || ''}
+          onChange={handleChange}
           placeholder="Ссылка на фото"
           required
         />
         <span className="form__validation-error">
-          {errorMessage}
+          {errors.avatar}
         </span>
       </div>
     </PopupWithForm>

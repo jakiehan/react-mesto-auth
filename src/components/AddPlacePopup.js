@@ -1,44 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PopupWithForm from './PopupWithForm.js';
+import { useFormAndValidation } from '../hooks/useFormAndValidation';
 
 const AddPlacePopup = ({ isOpen, onClose, onUploadCard, isPreloader }) => {
 
-  const [values, setValues] = useState({});
-  const [isValidName, setIsValidName] = useState(false);
-  const [isValidLink, setIsValidLink] = useState(false);
-  const [errorMessageName, setErrorMessageName] = useState('');
-  const [errorMessageLink, setErrorMessageLink] = useState('');
+  const {values, handleChange, errors, isValid, resetForm} = useFormAndValidation();
 
-  const errorClsInputName = errorMessageName && 'form__field_type_error';
-  const errorClsInputLink = errorMessageLink && 'form__field_type_error';
-
-  const isValidBtn = isValidName && isValidLink && true;
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setValues((prev) => ({
-      ...prev,
-      [name]: value
-    }))
-
-    if (name === "name") {
-      if (!e.target.validity.valid) {
-        setIsValidName(false);
-        setErrorMessageName(e.target.validationMessage);
-      } else {
-        setIsValidName(true);
-        setErrorMessageName('');
-      }
-    } else {
-      if (!e.target.validity.valid) {
-        setIsValidLink(false);
-        setErrorMessageLink(e.target.validationMessage);
-      } else {
-        setIsValidLink(true);
-        setErrorMessageLink('');
-      }
-    }
-  }
+  const errorClsInputName = errors.name && 'form__field_type_error';
+  const errorClsInputLink = errors.link && 'form__field_type_error';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,11 +19,7 @@ const AddPlacePopup = ({ isOpen, onClose, onUploadCard, isPreloader }) => {
   }
 
   useEffect(() => {
-    setValues({});
-    setIsValidName(false);
-    setIsValidLink(false);
-    setErrorMessageLink('');
-    setErrorMessageName('');
+    resetForm();
   }, [isOpen]);
 
   return (
@@ -63,7 +28,7 @@ const AddPlacePopup = ({ isOpen, onClose, onUploadCard, isPreloader }) => {
       formTitle="Новое место"
       btnTitle="Создать"
       preloaderBtnTitle="Создание..."
-      btnIsValid={isValidBtn}
+      btnIsValid={isValid}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -83,7 +48,7 @@ const AddPlacePopup = ({ isOpen, onClose, onUploadCard, isPreloader }) => {
           maxLength="30"
         />
         <span className="form__validation-error">
-          {errorMessageName}
+          {errors.name}
         </span>
       </div>
       <div className="form__input-wrapper">
@@ -98,7 +63,7 @@ const AddPlacePopup = ({ isOpen, onClose, onUploadCard, isPreloader }) => {
           required
         />
         <span className="form__validation-error">
-          {errorMessageLink}
+          {errors.link}
         </span>
       </div>
     </PopupWithForm>

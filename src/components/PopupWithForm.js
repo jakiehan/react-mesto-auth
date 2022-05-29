@@ -14,7 +14,6 @@ const PopupWithForm = ({ isOpen, onClose, name, onSubmit, children, btnTitle, is
       if (e.key === 'Escape') {
         onClose();
       }
-
     }
     document.addEventListener('keydown', closeAllPopupsOnEscape);
     return () => document.removeEventListener('keydown', closeAllPopupsOnEscape);

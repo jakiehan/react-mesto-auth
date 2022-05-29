@@ -1,47 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import PopupWithForm from './PopupWithForm.js';
 import {CurrentUserContext} from '../contexts/CurrentUserContext';
+import { useFormAndValidation } from '../hooks/useFormAndValidation';
 
 const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isPreloader }) => {
 
   const currentUser = useContext(CurrentUserContext);
-  const [values, setValues] = useState({});
-  const [isValidName, setIsValidName] = useState(true);
-  const [isValidAbout, setIsValidAbout] = useState(true);
-  const [errorMessageName, setErrorMessageName] = useState('');
-  const [errorMessageAbout, setErrorMessageAbout] = useState('');
 
-  const errorClsInputName = errorMessageName && 'form__field_type_error';
-  const errorClsInputAbout = errorMessageAbout && 'form__field_type_error';
+  const {values, handleChange, errors, isValid, setValues, resetForm} = useFormAndValidation();
 
-  const isValidBtn = isValidName && isValidAbout && true;
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
-
-    setValues((prev) => ({
-      ...prev,
-      [name]: value
-    }))
-
-    if (name === "name") {
-      if (!e.target.validity.valid) {
-        setIsValidName(false);
-        setErrorMessageName(e.target.validationMessage);
-      } else {
-        setIsValidName(true);
-        setErrorMessageName('');
-      }
-    } else {
-      if (!e.target.validity.valid) {
-        setIsValidAbout(false);
-        setErrorMessageAbout(e.target.validationMessage);
-      } else {
-        setIsValidAbout(true);
-        setErrorMessageAbout('');
-      }
-    }
-  }
+  const errorClsInputName = errors.name && 'form__field_type_error';
+  const errorClsInputAbout = errors.about && 'form__field_type_error';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -53,11 +22,8 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isPreloader }) => {
   }
 
   useEffect(() => {
+    resetForm();
     setValues(currentUser);
-    setErrorMessageName('')
-    setErrorMessageAbout('')
-    setIsValidName(true)
-    setIsValidAbout(true)
   }, [isOpen, currentUser]);
 
   return (
@@ -66,7 +32,7 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isPreloader }) => {
       formTitle="Редактировать профиль"
       btnTitle="Сохранить"
       preloaderBtnTitle="Сохранение..."
-      btnIsValid={isValidBtn}
+      btnIsValid={isValid}
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -86,7 +52,7 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isPreloader }) => {
           maxLength="40"
         />
         <span className="form__validation-error">
-          {errorMessageName}
+          {errors.name}
         </span>
       </div>
       <div className="form__input-wrapper">
@@ -103,7 +69,7 @@ const EditProfilePopup = ({ isOpen, onClose, onUpdateUser, isPreloader }) => {
           maxLength="200"
         />
         <span className="form__validation-error">
-          {errorMessageAbout}
+          {errors.about}
         </span>
       </div>
     </PopupWithForm>

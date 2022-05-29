@@ -33,45 +33,6 @@ const App = () => {
   const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
 
-
-  // Валидацию пока не хватило времени и ума как сделать правильно(
-
-  // Бургерное меню тоже не реализовано из-за нехватки времени до дедлайна, но в процессе доделаю
-
-
-  /*const [validationData, setValidationData] = useState({
-    isValid: {},
-    errorMessage: {}
-  })*/
-
-/*  const checkValidityInput = (input) => {
-    if (!input.validity.valid) {
-      setValidationData((prev) => ({
-        ...prev,
-        isValid: {
-          ...prev,
-          [input.name]: false
-        },
-        errorMessage: {
-          ...prev,
-          [input.name]: input.validationMessage
-        }
-      }))
-    } else {
-      setValidationData((prev) => ({
-        ...prev,
-        isValid: {
-          ...prev,
-          [input.name]: true
-        },
-        errorMessage: {
-          ...prev,
-          [input.name]: ''
-        }
-      }))
-        }
-  }*/
-
   useEffect(() => {
     checkJwt();
   }, [])
