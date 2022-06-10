@@ -31,6 +31,7 @@ const App = () => {
   const [isRegistered, setIsRegistered] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +40,6 @@ const App = () => {
 
   const checkJwt = () => {
     const jwt = localStorage.getItem('jwt');
-
     if (jwt) {
       auth.checkJwt(jwt)
         .then((res) => {
@@ -48,8 +48,13 @@ const App = () => {
           navigate('/');
         }).catch(err => {
         console.log(`Ошибка: ${ err }`)
+      }).finally(()=>{
+        setIsAuthLoading(true);
       })
+    } else {
+      setIsAuthLoading(true);
     }
+
   }
 
   useEffect(() => {
@@ -182,7 +187,7 @@ const App = () => {
         <Header userEmail={userEmail} handleSingOut={handleSingOut} />
         <Routes>
           <Route path="/" element={
-              <ProtectedRoute loggedIn={loggedIn}>
+              <ProtectedRoute loggedIn={loggedIn} isAuthLoading={isAuthLoading}>
                 <Main
                   onEditProfile={handleEditProfileClick}
                   onAddPlace={handleAddPlaceClick}
