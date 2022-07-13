@@ -3,7 +3,7 @@ import PopupWithForm from './PopupWithForm.js';
 import crash from '../images/crash.svg'
 import successfully from '../images/successfully.svg'
 
-const infoTooltip = ({ onClose, isOpen, isRegistered }) => {
+const infoTooltip = ({ onClose, isOpen, isRegistered, isMessage }) => {
 
   return (
     <PopupWithForm
@@ -13,7 +13,7 @@ const infoTooltip = ({ onClose, isOpen, isRegistered }) => {
       onClose={onClose}
     >
       <img className="popup__icon" src={isRegistered ? successfully : crash} alt="Логотип" />
-      <p className="popup__title popup__title_position_center">{isRegistered ? 'Вы успешно зарегистрировались!' : 'Что-то пошло не так! Попробуйте ещё раз.'}</p>
+      <p className="popup__title popup__title_position_center">{isRegistered ? 'Вы успешно зарегистрировались!' : isMessage}</p>
     </PopupWithForm>
   )
 }

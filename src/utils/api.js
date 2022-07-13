@@ -1,7 +1,6 @@
 class Api {
   constructor() {
-    this._url = 'https://nomoreparties.co/v1/cohort-38/';
-    this._token = '65c30779-9ea9-44cb-b8d2-edc42f5a7e98';
+    this._url = 'https://api.mesto-jaki.nomorepartiesxyz.ru';
   }
 
   _makeRequest(promise) {
@@ -15,31 +14,32 @@ class Api {
     })
   }
 
-  getUserInfo() {
+  getUserInfo(jwt) {
     const promise = fetch(`${this._url}/users/me`, {
       headers: {
-        authorization: this._token,
-        'Content-Type': 'application/json'
+        method: 'GET',
+        authorization: `Bearer ${jwt}`,
+        'Content-Type': 'application/json',
       }
     })
     return this._makeRequest(promise)
   }
 
-  getCards() {
+  getCards(jwt) {
     const promise = fetch(`${this._url}/cards`, {
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       }
     })
     return this._makeRequest(promise)
   }
 
-  setUserInfo({ name, about }) {
+  setUserInfo({ name, about }, jwt ) {
     const promise = fetch(`${this._url}/users/me`, {
       method: 'PATCH',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -50,11 +50,11 @@ class Api {
     return this._makeRequest(promise)
   }
 
-  uploadCard({ name, link }) {
+  uploadCard({ name, link }, jwt) {
     const promise = fetch(`${this._url}/cards`, {
       method: 'POST',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -65,33 +65,33 @@ class Api {
     return this._makeRequest(promise)
   }
 
-  deleteCard(id) {
+  deleteCard(id, jwt) {
     const promise = fetch(`${this._url}/cards/${id}`, {
       method: 'DELETE',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       }
     })
     return this._makeRequest(promise)
   }
 
-  changeLikeCardStatus(id, status) {
+  changeLikeCardStatus(id, status, jwt) {
     const method = (status ? 'PUT' : 'DELETE')
     const promise = fetch(`${this._url}/cards/${id}/likes`, {
       method: method,
       headers: {
-        authorization: this._token
+        authorization: `Bearer ${jwt}`
       }
     })
     return this._makeRequest(promise)
   }
 
-  setUserAvatar({ avatar }) {
-    const promise = fetch(`${this._url}users/me/avatar`, {
+  setUserAvatar({ avatar }, jwt) {
+    const promise = fetch(`${this._url}/users/me/avatar`, {
       method: 'PATCH',
       headers: {
-        authorization: this._token,
+        authorization: `Bearer ${jwt}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({

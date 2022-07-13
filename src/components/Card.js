@@ -5,7 +5,9 @@ const Card = ({ card, onCardDelete, onCardLike, onCardClick }) => {
 
   const currentUser = useContext(CurrentUserContext);
 
-  const isOwn = card.owner._id === currentUser._id;
+  const cardExists = card.owner ? card.owner._id : ''
+
+  const isOwn = cardExists === currentUser._id;
   const isLiked = card.likes.some(like => like._id === currentUser._id);
   const likesCount = (!!card.likes.length && card.likes.length);
 

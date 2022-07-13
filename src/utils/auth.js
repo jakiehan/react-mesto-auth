@@ -1,11 +1,15 @@
-const BASE_URL = 'https://auth.nomoreparties.co';
+const BASE_URL = 'https://api.mesto-jaki.nomorepartiesxyz.ru';
 
   const checkResponse = (promise) => {
     return promise.then(res => {
       if (res.ok) {
         return res.json();
       }
-      throw res.status;
+      return res.json().then((err) => {
+        if(err) {
+          throw err;
+        }
+      })
     }).then(obj => {
       return obj;
     })
@@ -40,8 +44,8 @@ export const checkJwt = (jwt) => {
     method: 'GET',
     headers: {
       'Accept': 'application/json',
-      "Content-Type": "application/json",
-      "Authorization" : `Bearer ${jwt}`
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwt}`
     },
   })
   return checkResponse(promise)

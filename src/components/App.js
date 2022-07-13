@@ -32,11 +32,8 @@ const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isErrorMessage, setIsErrorMessage] = useState('');
   const navigate = useNavigate();
-
-  useEffect(() => {
-    checkJwt();
-  }, [])
 
   const checkJwt = () => {
     const jwt = localStorage.getItem('jwt');
@@ -44,90 +41,138 @@ const App = () => {
       auth.checkJwt(jwt)
         .then((res) => {
           setLoggedIn(true);
-          setUserEmail(res.data.email);
+          setUserEmail(res.email);
           navigate('/');
         }).catch(err => {
-        console.log(`Ошибка: ${ err }`)
+        console.log(`Ошибка: ${err.message}`)
       }).finally(()=>{
         setIsAuthLoading(true);
       })
     } else {
       setIsAuthLoading(true);
     }
-
   }
+
+  useEffect(() => {
+    checkJwt();
+  }, [])
 
   useEffect(() => {
 
     if (loggedIn) {
-      Promise.all([api.getUserInfo(), api.getCards()])
+      const jwt = localStorage.getItem('jwt');
+      Promise.all([api.getUserInfo(jwt), api.getCards(jwt)])
         .then(([userData, cardsData]) => {
           setCurrentUser(userData);
-          setCards(cardsData);
+          setCards(cardsData.reverse());
         }).catch(err => {
-        console.log(`Ошибка: ${ err }`)
+        console.log(`Ошибка: ${err.message}`)
       })
     }
-  },[loggedIn])
+  },[loggedIn, ])
+
+  const handleRegister = (password, email) => {
+    setIsPreloaderBtn(true);
+    auth.register(password, email)
+      .then((res) => {
+        if (res) {
+          setIsRegistered(true);
+          navigate('/sign-in');
+        }
+      }).catch(err => {
+      setIsRegistered(false);
+      setIsErrorMessage(err.message);
+    }).finally(() => {
+      setIsPreloaderBtn(false);
+      setIisInfoTooltipPopupOpen(true);
+    })
+  }
+
+  const handleLogin = (password, email) => {
+    setIsPreloaderBtn(true);
+    auth.login(password, email)
+      .then((jwt) => {
+        if (jwt.token) {
+          localStorage.setItem('jwt', jwt.token)
+          checkJwt();
+        }
+      }).catch(err => {
+      setIsRegistered(false);
+      setIisInfoTooltipPopupOpen(true);
+      setIsErrorMessage(err.message);
+    }).finally(() => {
+      setIsPreloaderBtn(false);
+    })
+  }
+
+  const handleSingOut = () => {
+    localStorage.removeItem('jwt');
+    setLoggedIn(false);
+  }
 
   const handleUpdateUser = (inputData) => {
+    const jwt = localStorage.getItem('jwt');
     setIsPreloaderBtn(true);
-    api.setUserInfo(inputData)
+    api.setUserInfo(inputData, jwt)
       .then((UserInfo) => {
         setCurrentUser(UserInfo);
         closeAllPopups();
       }).catch(err => {
-      console.log(`Ошибка: ${ err }`)
+      console.log(`Ошибка: ${err.message}`)
     }).finally(() => {
       setIsPreloaderBtn(false);
     })
   }
 
   const handleUpdateAvatar = (avatarUrl) => {
+    const jwt = localStorage.getItem('jwt');
     setIsPreloaderBtn(true);
-    api.setUserAvatar(avatarUrl)
+    api.setUserAvatar(avatarUrl, jwt)
       .then((UserAvatar) => {
         setCurrentUser(UserAvatar);
         closeAllPopups();
       }).catch(err => {
-      console.log(`Ошибка: ${ err }`)
+      console.log(`Ошибка: ${err.message}`)
     }).finally(() => {
       setIsPreloaderBtn(false);
     })
   }
 
   const handleAddPlaceSubmit = (inputData) => {
+    const jwt = localStorage.getItem('jwt');
     setIsPreloaderBtn(true);
-    api.uploadCard(inputData)
+    api.uploadCard(inputData, jwt)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
       }).catch(err => {
-      console.log(`Ошибка: ${ err }`)
+      console.log(`Ошибка: ${err.message}`)
     }).finally(() => {
       setIsPreloaderBtn(false);
     })
   }
 
   const handleCardLike = (card) => {
+    const jwt = localStorage.getItem('jwt');
     const isLiked = card.likes.some(like => like._id === currentUser._id);
 
-    api.changeLikeCardStatus(card._id, !isLiked)
+    api.changeLikeCardStatus(card._id, !isLiked, jwt)
       .then((newCard) => {
         setCards((state) => state.map((stateCard) => stateCard._id === card._id ? newCard : stateCard));
       }).catch(err => {
-      console.log(`Ошибка: ${ err }`);
+      console.log(`Ошибка: ${err.message}`);
     })
   }
 
   const handleCardDelete = (card) => {
+    const jwt = localStorage.getItem('jwt');
     setIsPreloaderBtn(true);
-    api.deleteCard(card._id)
+    api.deleteCard(card._id, jwt)
       .then(() => {
         setCards((state) => state.filter((stateCard) => stateCard._id !== card._id && stateCard));
         closeAllPopups();
       }).catch(err => {
-      console.log(`Не удалось удалить фото-карточку ${ err }`);
+      console.log(`Не удалось удалить фото-карточку ${err.message}`);
     }).finally(() => {
       setIsPreloaderBtn(false);
     })
@@ -146,39 +191,7 @@ const App = () => {
     setIisInfoTooltipPopupOpen(false);
     setSelectedCard({});
     setCardToDelete({});
-  }
-
-  const handleRegister = (password, email) => {
-    setIsPreloaderBtn(true);
-    auth.register(password, email)
-      .then(() => {
-        setIsRegistered(true);
-      }).catch(err => {
-      console.log(`Не удалось зарегистрироваться ${ err }`);
-      setIsRegistered(false);
-    }).finally(() => {
-      setIsPreloaderBtn(false);
-      setIisInfoTooltipPopupOpen(true);
-    })
-  }
-
-  const handleLogin = (password, email) => {
-    setIsPreloaderBtn(true);
-    auth.login(password, email)
-      .then((jwt) => {
-        localStorage.setItem('jwt', jwt.token)
-        setLoggedIn(true);
-        navigate('/');
-      }).catch(err => {
-      console.log(`Не удалось войти ${ err }`);
-    }).finally(() => {
-      setIsPreloaderBtn(false);
-    })
-  }
-
-  const handleSingOut = () => {
-    localStorage.removeItem('jwt');
-    setLoggedIn(false);
+    setIsErrorMessage('');
   }
 
   return (
@@ -238,6 +251,7 @@ const App = () => {
           isOpen={isInfoTooltipPopupOpen}
           onClose={closeAllPopups}
           isRegistered={isRegistered}
+          isMessage={isErrorMessage}
         />
       </div>
     </CurrentUserContext.Provider>
